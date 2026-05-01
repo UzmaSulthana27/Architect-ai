@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neon: #a855f7;
+  --color-midnight: #020617;
+  --color-twilight: #0f172a;
+  --color-neon-text: #f8fafc;
+  --color-primary: var(--text-primary);
+  --color-muted: var(--text-muted);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  :root {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --text-primary: #f8fafc;
+    --text-muted: rgba(248, 250, 252, 0.6);
+    --accent: #d8b4fe;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(2, 6, 23, 0.8);
+    --card-bg: rgba(15, 23, 42, 0.7);
+    --grid-color: #a855f7;
+  }
+
+  .light {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-muted: #475569;
+    --accent: #7c3aed;
+    --border-color: rgba(15, 23, 42, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --card-bg: #ffffff;
+    --grid-color: #cbd5e1;
+  }
+
+  .dark {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --text-primary: #f8fafc;
+    --text-muted: rgba(248, 250, 252, 0.75);
+    --accent: #d8b4fe;
+    --border-color: rgba(255, 255, 255, 0.15);
+    --glass-bg: rgba(2, 6, 23, 0.85);
+    --card-bg: rgba(15, 23, 42, 0.8);
+    --grid-color: #a855f7;
+  }
+
+  body {
+    @apply transition-colors duration-300;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    background-image: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::selection {
+    background-color: var(--accent);
+    color: var(--bg-primary);
+  }
+
+  /* Code Highlighting Core for Prism */
+  .token.comment, .token.prolog, .token.doctype, .token.cdata { @apply opacity-40 italic; }
+  .token.punctuation { @apply opacity-60; }
+  .token.namespace { @apply opacity-70; }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: var(--color-neon); }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { @apply text-emerald-400; }
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { @apply text-amber-300; }
+  .token.atrule, .token.attr-value, .token.keyword { @apply text-purple-400; }
+  .token.function, .token.class-name { @apply text-blue-400; }
+  .token.regex, .token.important, .token.variable { @apply text-orange-400; }
+  
+  .light .token.property, .light .token.tag, .light .token.keyword { @apply text-purple-700; }
+  .light .token.string, .light .token.attr-name { @apply text-emerald-700; }
+  .light .token.function { @apply text-blue-700; }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-xl border transition-all duration-300;
+    background-color: var(--glass-bg);
+    border-color: var(--border-color);
+  }
+  
+  .glass-card {
+    @apply backdrop-blur-xl border rounded-2xl shadow-2xl transition-all duration-300;
+    background-color: var(--glass-bg);
+    border-color: var(--border-color);
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 15px var(--color-neon);
+  }
+
+  /* Animations */
+  @keyframes caret {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.05); }
+  }
+
+  .animate-caret {
+    animation: caret 1s infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+}
