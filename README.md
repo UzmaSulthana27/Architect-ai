@@ -25,15 +25,21 @@ To deploy the frontend to Vercel:
 1. **Export to GitHub**: Use the "Export to GitHub" feature in AI Studio settings.
 2. **Import to Vercel**: Connect your GitHub account to Vercel and select the repository.
 3. **Configure Project**:
+   - **Framework Preset**: `Vite`
    - **Root Directory**: `frontend`
-   - **Framework Preset**: Vite
    - **Build Command**: `npm install && npm run build`
-   - **Environment Variables**: Add `VITE_API_URL` pointing to your Render backend URL.
+   - **Output Directory**: `dist`
+   - **Environment Variables**: Add `VITE_API_URL` pointing to your Render backend URL (e.g., `https://architect-ai-backend.onrender.com`).
+
+4. **Finding your Vercel URL**:
+   - Once you create the project in Vercel, go to the **Project Overview** page.
+   - You will see a "Domains" section or a large preview with a link (e.g., `https://architect-ai.vercel.app`).
+   - If the build fails, you can still find the assigned domain in **Settings > Domains**. Use this for your Render `CORS_ORIGIN`.
 
 ### Backend (Render)
 To deploy the backend to Render:
 1. **New Web Service**: Create a new Web Service in the Render dashboard.
-2. **Select Repository**: Choose your synced GitHub repository.
+2. **Select Repository**: choose your synced GitHub repository.
 3. **Configure Service**:
    - **Root Directory**: `backend`
    - **Environment**: `Node`
@@ -42,7 +48,11 @@ To deploy the backend to Render:
 4. **Environment Variables**:
    - `NODE_ENV`: `production`
    - `GEMINI_API_KEY`: Your Google Gemini API Key
-   - `CORS_ORIGIN`: Your Vercel frontend URL (e.g., `https://your-app.vercel.app`)
+   - `CORS_ORIGIN`: Your actual Vercel frontend URL (from step above). Use `*` temporarily if you aren't sure yet.
+   - `PORT`: `3000` (Render usually sets this automatically, but you can be explicit).
+
+> [!TIP]
+> If Vercel fails to resolve `src/main.jsx`, ensure your **Root Directory** in Vercel is set to `frontend`. This ensures Vite runs from the correct folder.
 
 ## 🚀 Getting Started
 
