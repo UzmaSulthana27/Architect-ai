@@ -22,8 +22,7 @@ export default defineConfig(({mode}) => {
     'VITE_SUPABASE_URL',
     'VITE_SUPABASE_ANON_KEY',
     'SUPABASE_URL',
-    'SUPABASE_ANON_KEY',
-    'GEMINI_API_KEY'
+    'SUPABASE_ANON_KEY'
   ];
 
   // Log all keys to help find the correct ones
@@ -41,7 +40,7 @@ export default defineConfig(({mode}) => {
   });
 
   return {
-    root: path.resolve(__dirname, '.'),
+    root: process.cwd(),
     plugins: [react(), tailwindcss()],
     define,
     resolve: {

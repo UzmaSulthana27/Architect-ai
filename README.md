@@ -33,13 +33,19 @@ To deploy the frontend to Vercel:
 
 4. **Finding your Vercel URL**:
    - Once you create the project in Vercel, go to the **Project Overview** page.
-   - You will see a "Domains" section or a large preview with a link (e.g., `https://architect-ai.vercel.app`).
-   - If the build fails, you can still find the assigned domain in **Settings > Domains**. Use this for your Render `CORS_ORIGIN`.
+   - You will see a "Domains" section with a link (e.g., `https://architect-ai-uzmas-projects.vercel.app`).
+   - If the build is still running, you can find the url in **Settings > Domains**.
+   - **Important**: Use this exact URL for your Render `CORS_ORIGIN` environment variable.
+
+### Final Verification
+- **Frontend**: Visit your Vercel URL. It should load the "Neural Console".
+- **Backend API**: Visit `https://your-backend.onrender.com/api/health`. It should return `{"status": "ok"}`.
+- **Connection**: Open the browser console on your Vercel app. If you see CORS errors, double check the `CORS_ORIGIN` on Render.
 
 ### Backend (Render)
 To deploy the backend to Render:
 1. **New Web Service**: Create a new Web Service in the Render dashboard.
-2. **Select Repository**: choose your synced GitHub repository.
+2. **Select Repository**: Choose your synced GitHub repository.
 3. **Configure Service**:
    - **Root Directory**: `backend`
    - **Environment**: `Node`
@@ -52,7 +58,7 @@ To deploy the backend to Render:
    - `PORT`: `3000` (Render usually sets this automatically, but you can be explicit).
 
 > [!TIP]
-> If Vercel fails to resolve `src/main.jsx`, ensure your **Root Directory** in Vercel is set to `frontend`. This ensures Vite runs from the correct folder.
+> Ensure your Vercel **Root Directory** is set to `frontend`. Our configuration now uses `./src/main.jsx` which is highly compatible with Vercel's build process.
 
 ## 🚀 Getting Started
 
