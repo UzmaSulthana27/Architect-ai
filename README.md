@@ -18,6 +18,32 @@ The interface layer, built with **React 19** and **Vite 6**.
 - **`public/`**: Static assets and neural configuration maps.
 - **`vite.config.js`**: Optimized build configuration for high-performance neural rendering.
 
+## 🌐 Deployment
+
+### Frontend (Vercel)
+To deploy the frontend to Vercel:
+1. **Export to GitHub**: Use the "Export to GitHub" feature in AI Studio settings.
+2. **Import to Vercel**: Connect your GitHub account to Vercel and select the repository.
+3. **Configure Project**:
+   - **Root Directory**: `frontend`
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm install && npm run build`
+   - **Environment Variables**: Add `VITE_API_URL` pointing to your Render backend URL.
+
+### Backend (Render)
+To deploy the backend to Render:
+1. **New Web Service**: Create a new Web Service in the Render dashboard.
+2. **Select Repository**: Choose your synced GitHub repository.
+3. **Configure Service**:
+   - **Root Directory**: `backend`
+   - **Environment**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. **Environment Variables**:
+   - `NODE_ENV`: `production`
+   - `GEMINI_API_KEY`: Your Google Gemini API Key
+   - `CORS_ORIGIN`: Your Vercel frontend URL (e.g., `https://your-app.vercel.app`)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
