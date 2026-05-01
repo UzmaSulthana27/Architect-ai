@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs";
 import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
@@ -12,7 +13,12 @@ async function startServer() {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  const corsOptions = {
+    origin: process.env.CORS_ORIGIN || "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  };
+  app.use(cors(corsOptions));
   app.use(express.json());
   
   // Initialize Gemini AI
@@ -72,10 +78,16 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    } else {
+      app.get("/", (req, res) => {
+        res.json({ message: "Architect AI Backend is running. API is at /api" });
+      });
+    }
   }
 
   app.listen(PORT, "0.0.0.0", () => {
