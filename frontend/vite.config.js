@@ -40,7 +40,6 @@ export default defineConfig(({mode}) => {
   });
 
   return {
-    root: process.cwd(),
     plugins: [react(), tailwindcss()],
     define,
     resolve: {

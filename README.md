@@ -30,6 +30,7 @@ To deploy the frontend to Vercel:
    - **Build Command**: `npm install && npm run build`
    - **Output Directory**: `dist`
    - **Environment Variables**: Add `VITE_API_URL` pointing to your Render backend URL (e.g., `https://architect-ai-backend.onrender.com`).
+     * **CRITICAL**: Ensure there is **no leading space** in the variable name (e.g., use `VITE_API_URL`, not ` VITE_API_URL`). Vercel will reject names with spaces.
 
 4. **Finding your Vercel URL**:
    - Once you create the project in Vercel, go to the **Project Overview** page.
