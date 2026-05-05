@@ -35,11 +35,24 @@ export function buildPreviewHTML(files) {
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-  <script src="https://unpkg.com/lucide-react"></script>
+  <script src="https://unpkg.com/framer-motion@11.0.3/dist/framer-motion.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            neon: '#1ee6d2',
+            'bg-dark': '#0b1326',
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    body { background: #0b1326; color: white; margin: 0; min-height: 100vh; font-family: sans-serif; }
+    body { background: #0b1326; color: white; margin: 0; min-height: 100vh; font-family: sans-serif; overflow-x: hidden; }
     .glass-card {
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(20px);
@@ -53,7 +66,6 @@ export function buildPreviewHTML(files) {
     // Console log forwarding
     const originalLog = console.log;
     const originalError = console.error;
-    const originalWarn = console.warn;
     
     function forwardLog(level, args) {
       window.parent.postMessage({
@@ -65,9 +77,8 @@ export function buildPreviewHTML(files) {
 
     console.log = (...args) => { originalLog(...args); forwardLog('info', args); };
     console.error = (...args) => { originalError(...args); forwardLog('error', args); };
-    console.warn = (...args) => { originalWarn(...args); forwardLog('warn', args); };
 
-    window.onerror = (message, source, lineno, colno, error) => {
+    window.onerror = (message) => {
       console.error(message);
     };
   </script>
@@ -77,40 +88,58 @@ export function buildPreviewHTML(files) {
 
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo } = React;
-    const { motion, AnimatePresence } = window.Motion || {}; // framer-motion might attach to window.Motion
+    const { motion, AnimatePresence } = window.Motion || {};
     
-    // Mock for lucide-react if needed, or use UMD
-    const Icons = window.Lucide || {};
+    // Auto-inject lucide icons into the global scope
+    if (window.lucide) {
+      Object.entries(window.lucide.icons).forEach(([name, icon]) => {
+        const componentName = name.charAt(0).toUpperCase() + name.slice(1).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+        window[componentName] = lucide.createLucideIcon(name, icon);
+      });
+    }
 
     // Helper to extract component name from code
     function findComponentName(code) {
-      const match = code.match(/export default function (\\w+)/) || code.match(/function (\\w+)/) || code.match(/const (\\w+) =/);
+      const match = code.match(/export default function (\w+)/) || 
+                    code.match(/function (\w+)/) || 
+                    code.match(/const (\w+) =/);
       return match ? match[1] : 'PreviewComponent';
     }
 
     try {
-      // In a real environment we'd handle multiple files and imports.
-      // Here we assume a single self-contained component for preview.
-      // We strip exports to avoid Babel issues in standalone mode if it's treated as a script.
-      let transformedCode = \`${code.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-      transformedCode = transformedCode.replace(/export default /g, '');
-      transformedCode = transformedCode.replace(/import .* from .*/g, '');
+      // Use hex encoding for the code to avoid any escaping issues in the generated string
+      const hexCode = '${Buffer.from(code).toString('hex')}';
+      const decodedCode = new TextDecoder().decode(new Uint8Array(hexCode.match(/.{1,2}/g).map(byte => parseInt(byte, 16))));
+      
+      let transformedCode = decodedCode;
+      
+      // Sophisticated import removal - non-greedy and handles multiline
+      transformedCode = transformedCode.replace(/import[\s\S]*?from\s+['"].*?['"];?/g, '');
+      transformedCode = transformedCode.replace(/export\s+default\s+/g, '');
       
       const componentName = findComponentName(transformedCode);
       
-      const FinalCode = \`
+      const renderCode = \`
         \${transformedCode}
-        const root = ReactDOM.createRoot(document.getElementById('preview-root'));
-        root.render(React.createElement(\${componentName}));
+        const container = document.getElementById('preview-root');
+        if (container) {
+          const root = ReactDOM.createRoot(container);
+          root.render(React.createElement(\${componentName}));
+        }
       \`;
       
-      eval(Babel.transform(FinalCode, { presets: ['react'] }).code);
+      const transformed = Babel.transform(renderCode, { 
+        presets: ['react'],
+        plugins: [] 
+      }).code;
+      
+      eval(transformed);
     } catch (err) {
-      console.error("Preview Render Error: " + err.message);
+      console.error("Synthesis Error: " + err.message);
       document.getElementById('preview-root').innerHTML = \`
-        <div style="padding: 40px; text-align: center;">
-          <h2 style="color: #ff4d4d;">Synthesis Error</h2>
-          <p style="opacity: 0.7;">\${err.message}</p>
+        <div style="padding: 40px; text-align: center; font-family: monospace;">
+          <h2 style="color: #1ee6d2; margin-bottom: 10px;">NEURAL SYNTHESIS FAILURE</h2>
+          <p style="opacity: 0.7; color: #ff6b6b;">\${err.message}</p>
         </div>
       \`;
     }

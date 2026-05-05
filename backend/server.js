@@ -77,7 +77,10 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = fs.existsSync(path.join(process.cwd(), "frontend/dist"))
+      ? path.join(process.cwd(), "frontend/dist")
+      : path.join(process.cwd(), "dist");
+      
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
       app.get("*", (req, res) => {
