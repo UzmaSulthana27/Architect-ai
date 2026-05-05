@@ -107,33 +107,44 @@ export function buildPreviewHTML(files) {
     }
 
     try {
-      // Use hex encoding for the code to avoid any escaping issues in the generated string
-      const hexCode = '${Buffer.from(code).toString('hex')}';
-      const decodedCode = new TextDecoder().decode(new Uint8Array(hexCode.match(/.{1,2}/g).map(byte => parseInt(byte, 16))));
+      const base64Code = btoa(unescape(encodeURIComponent(code)));
       
-      let transformedCode = decodedCode;
+      const renderCode = `
+        (function() {
+          try {
+            const decodedCode = decodeURIComponent(escape(atob('${base64Code}')));
+            let transformedCode = decodedCode;
+            
+            transformedCode = transformedCode.replace(/import[\\s\\S]*?from\\s+['"].*?['"];?/g, '');
+            transformedCode = transformedCode.replace(/export\\s+default\\s+/g, '');
+            
+            function getCompName(c) {
+              const m = c.match(/export\\s+default\\s+function\\s+(\\w+)/) || 
+                        c.match(/function\\s+(\\w+)/) || 
+                        c.match(/const\\s+(\\w+)\\s+=/);
+              return m ? m[1] : 'PreviewComponent';
+            }
+
+            const compName = getCompName(transformedCode);
+            const backtick = String.fromCharCode(96);
+            
+            const finalSource = transformedCode + "\\n" +
+              "const container = document.getElementById('preview-root');" + "\\n" +
+              "if (container) {" + "\\n" +
+              "  const root = ReactDOM.createRoot(container);" + "\\n" +
+              "  root.render(React.createElement(" + compName + "));" + "\\n" +
+              "}";
+            
+            const transformed = Babel.transform(finalSource, { presets: ['react'] }).code;
+            eval(transformed);
+          } catch (e) {
+            console.error("Neural Synthesis Failure:", e.message);
+          }
+        })();
+      `;
       
-      // Sophisticated import removal - non-greedy and handles multiline
-      transformedCode = transformedCode.replace(/import[\s\S]*?from\s+['"].*?['"];?/g, '');
-      transformedCode = transformedCode.replace(/export\s+default\s+/g, '');
-      
-      const componentName = findComponentName(transformedCode);
-      
-      const renderCode = \`
-        \${transformedCode}
-        const container = document.getElementById('preview-root');
-        if (container) {
-          const root = ReactDOM.createRoot(container);
-          root.render(React.createElement(\${componentName}));
-        }
-      \`;
-      
-      const transformed = Babel.transform(renderCode, { 
-        presets: ['react'],
-        plugins: [] 
-      }).code;
-      
-      eval(transformed);
+      const outerTransformed = Babel.transform(renderCode, { presets: ['react'] }).code;
+      eval(outerTransformed);
     } catch (err) {
       console.error("Synthesis Error: " + err.message);
       document.getElementById('preview-root').innerHTML = \`
