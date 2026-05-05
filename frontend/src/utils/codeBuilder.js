@@ -109,28 +109,28 @@ export function buildPreviewHTML(files) {
     try {
       const base64Code = btoa(unescape(encodeURIComponent(code)));
       
-      const renderCode = `
+      const renderCode = \`
         (function() {
           try {
-            const decodedCode = decodeURIComponent(escape(atob('${base64Code}')));
+            const decodedCode = decodeURIComponent(escape(atob('\${base64Code}')));
             let transformedCode = decodedCode;
             
-            transformedCode = transformedCode.replace(/import[\\s\\S]*?from\\s+['"].*?['"];?/g, '');
-            transformedCode = transformedCode.replace(/export\\s+default\\s+/g, '');
+            transformedCode = transformedCode.replace(/import[\\\\s\\\\S]*?from\\\\s+['"].*?['"];?/g, '');
+            transformedCode = transformedCode.replace(/export\\\\s+default\\\\s+/g, '');
             
             function getCompName(c) {
-              const m = c.match(/export\\s+default\\s+function\\s+(\\w+)/) || 
-                        c.match(/function\\s+(\\w+)/) || 
-                        c.match(/const\\s+(\\w+)\\s+=/);
+              const m = c.match(/export\\\\s+default\\\\s+function\\\\s+(\\\\w+)/) || 
+                        c.match(/function\\\\s+(\\\\w+)/) || 
+                        c.match(/const\\\\s+(\\\\w+)\\\\s+=/);
               return m ? m[1] : 'PreviewComponent';
             }
 
             const compName = getCompName(transformedCode);
             const backtick = String.fromCharCode(96);
             
-            const finalSource = transformedCode + "\\n" +
-              "const container = document.getElementById('preview-root');" + "\\n" +
-              "if (container) {" + "\\n" +
+            const finalSource = transformedCode + "\\\\n" +
+              "const container = document.getElementById('preview-root');" + "\\\\n" +
+              "if (container) {" + "\\\\n" +
               "  const root = ReactDOM.createRoot(container);" + "\\n" +
               "  root.render(React.createElement(" + compName + "));" + "\\n" +
               "}";
@@ -141,7 +141,7 @@ export function buildPreviewHTML(files) {
             console.error("Neural Synthesis Failure:", e.message);
           }
         })();
-      `;
+      \`;
       
       const outerTransformed = Babel.transform(renderCode, { presets: ['react'] }).code;
       eval(outerTransformed);
