@@ -3,7 +3,7 @@ import path from "path";
 import cors from "cors";
 import dotenv from "dotenv";
 import fs from "fs";
-import { GoogleGenAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ async function startServer() {
   app.use(express.json());
   
   // Initialize Gemini AI
-  const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || '');
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
   // Request Logger
   app.use((req, res, next) => {
